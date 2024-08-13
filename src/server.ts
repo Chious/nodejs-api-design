@@ -2,25 +2,23 @@ import express from "express";
 import route from "./router";
 import morgan from "morgan";
 import cors from "cors";
+import { protectRoute } from "./modules/auth";
+import { createUser, signinUser } from "./handlers/user";
 
 const app = express();
-
-const customLogger = (message) => (req, res, next) => {
-  console.log(message);
-  next();
-};
 
 app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(customLogger("Hello from custom logger"));
 
 app.get("/", (req, res) => {
   res.send("<h1>Home Page</h1>");
   res.status(200);
 });
 
-app.use("/api", route);
+app.use("/api", protectRoute, route);
+app.post("/user", createUser);
+app.post("/signin", signinUser);
 
 export default app;
